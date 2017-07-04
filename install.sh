@@ -17,22 +17,22 @@ apt update --yes
 apt install --yes mdadm debootstrap gdisk zfsutils-linux
 
 
-sleep 2 # Zero mdadm superblock to prevent future corruption if mdadm attempt to rebuildan old array.
+# Zero mdadm superblock to prevent future corruption if mdadm attempt to rebuildan old array.
 mdadm --zero-superblock --force /dev/disk/by-id/${CHOICE_DISK}
 
-sleep 2 # Partition disks
+# Partition disks
 sgdisk     --clear               /dev/disk/by-id/${CHOICE_DISK}
 sgdisk     -n3:1M:+512M -t3:EF00 /dev/disk/by-id/${CHOICE_DISK}
 sgdisk     -n9:-8M:0    -t9:BF07 /dev/disk/by-id/${CHOICE_DISK}
 sgdisk     -n4:0:+512M  -t4:8300 /dev/disk/by-id/${CHOICE_DISK}
 sgdisk     -n1:0:0      -t1:8300 /dev/disk/by-id/${CHOICE_DISK}
 
-sleep 2 # Setup luks
+# Setup luks
 echo -n "${CHOICE_PASSPHRASE}" | cryptsetup luksFormat -c aes-xts-plain64 -s 256 -h sha256 /dev/disk/by-id/${CHOICE_DISK}-part1 -
 
 echo -n "${CHOICE_PASSPHRASE}" | cryptsetup luksOpen /dev/disk/by-id/${CHOICE_DISK}-part1 luks1 -
 
-sleep 2 # Create zfs pool
+# Create zfs pool
 zpool create \
       -o ashift=12 \
       -O atime=off \
@@ -43,14 +43,14 @@ zpool create \
       -R /mnt \
       rpool /dev/mapper/luks1
 
-sleep 2 # Create filesystem dataset to act as a container
+# Create filesystem dataset to act as a container
 zfs create -o canmount=off -o mountpoint=none rpool/ROOT
 
-sleep 2 # Create a filesystem dataset for the root filesystem of the ubuntu system
+# Create a filesystem dataset for the root filesystem of the ubuntu system
 zfs create -o canmount=noauto -o mountpoint=/ rpool/ROOT/ubuntu
 zfs mount rpool/ROOT/ubuntu
 
-sleep 2 # Create datasets
+# Create datasets
 zfs create                 -o setuid=off              rpool/home
 zfs create -o mountpoint=/root                        rpool/home/root
 zfs create -o canmount=off -o setuid=off  -o exec=off rpool/var
@@ -61,12 +61,12 @@ zfs create -o com.sun:auto-snapshot=false -o exec=on  rpool/var/tmp
 zfs create                                            rpool/srv
 zfs create                                            rpool/var/games
 
-sleep 2 # Create unencrypted boot partition
+# Create unencrypted boot partition
 mke2fs -t ext2 /dev/disk/by-id/${CHOICE_DISK}-part4
 mkdir /mnt/boot
 mount /dev/disk/by-id/${CHOICE_DISK}-part4 /mnt/boot
 
-sleep 2 # Install base system
+# Install base system
 chmod 1777 /mnt/var/tmp
 debootstrap xenial /mnt
 zfs set devices=off rpool
