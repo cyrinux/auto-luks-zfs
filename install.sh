@@ -1,3 +1,8 @@
+#!/usr/bin/env bash
+
+DESKTOP-PACKAGE=ubuntu-desktop
+
+
 echo -e "Velkommen :)\n"
 
 echo "Select disk:"
@@ -167,6 +172,8 @@ ls /boot/grub/*/zfs.mod
 zfs snapshot rpool/ROOT/ubuntu@install
 
 lsinitramfs /boot/initrd.img-*-generic |grep -E "cryptsetup$|cryptroot$"
+
+apt install --yes ${DESKTOP-PACKAGE}
 
 EOF
 
