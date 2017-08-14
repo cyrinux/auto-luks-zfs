@@ -1,7 +1,7 @@
 # auto-luks-zfs
 Automatic setup of luks + zfs
 
-## Ddisclaimer
+## Disclaimer
 - Barely tested.
 - Will wipe at least the target disk.
 - Use at own risk.
