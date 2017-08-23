@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-DESKTOP_PACKAGE=ubuntu-desktop
+DESKTOP_PACKAGE=ubuntu-minimal
 
 
 echo -e "Velkommen :)\n"
