@@ -17,6 +17,8 @@ read -es -p "Passphrase: " CHOICE_PASSPHRASE && echo ""
 read -es -p "Root passord: " CHOICE_ROOTPW && echo ""
 read -e  -p "Hostname: " CHOICE_HOSTNAME && echo ""
 
+modprobe -v efivars
+
 # Install requirements
 apt update --yes 
 apt install --yes mdadm debootstrap gdisk zfsutils-linux
@@ -162,7 +164,7 @@ update-initramfs -c -k all
 # Install grub
 sed -i.bkp -e '/GRUB_HIDDEN_TIMEOUT/ s/^#*/#/' -e '/GRUB_CMDLINE_LINUX_DEFAULT/ s/".*"//' -e '/GRUB_TERMINAL=console/ s/^#//' /etc/default/grub
 update-grub
-grub-install --target=x86_64-efi --efi-directory=/boot/efi \
+grub-install --verbose --target=x86_64-efi --efi-directory=/boot/efi \
       --bootloader-id=ubuntu --recheck --no-floppy
 
 # Verify grub module got installed
@@ -178,8 +180,8 @@ apt install --yes ${DESKTOP_PACKAGE}
 EOF
 
 # Clean up after chroot
-mount | grep -v zfs | tac | awk '/\/mnt/ {print $3}' | xargs -i{} umount -lf {}
-zpool export rpool
-cryptsetup luksClose luks1
+#mount | grep -v zfs | tac | awk '/\/mnt/ {print $3}' | xargs -i{} umount -lf {}
+#zpool export rpool
+#cryptsetup luksClose luks1
 sync
 echo "Now you can reboot :)"
